@@ -13,11 +13,9 @@ from scrapers.parsers import (
     ImageParserProtocol,
     DefaultImageParser,
 )
+from scrapers.user_agents import random_user_agent
 
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0"
-}
 
 
 class AbstractHTTPScraper(ABC):
@@ -39,15 +37,21 @@ class AbstractHTTPScraper(ABC):
         ] = None,  # allows us to specify optional headers
         html: Union[str, bytes, None] = None,
     ):
+
+        if not headers:
+            headers = {"User-Agent": random_user_agent()}
+        else:
+            headers["User-Agent"] = (
+                headers.get("User-Agent", None) or random_user_agent()
+            )
+
         if html:
             self.page_data = html
             self.url = url
         else:
-            if url is None:
-                raise ValueError("Url required for fetching recipe data")
             resp = requests.get(
                 url,
-                headers={**HEADERS, **(headers or {})},
+                headers=headers,
                 proxies=proxies,
                 timeout=timeout,
             )
