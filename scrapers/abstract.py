@@ -139,7 +139,9 @@ class AbstractHTTPScraper(ABC):
             return urljoin(self.url, canonical_link["href"])
         return self.url
 
-    def links(self, strictness: str = "loose") -> list[str]:
+    def links(
+        self, strictness: str = "loose", filter_function: callable = lambda url: True
+    ) -> list[str]:
         """Return a list of links on the page.
 
         Args:
@@ -165,7 +167,7 @@ class AbstractHTTPScraper(ABC):
             ):
                 continue
             links.append(a["href"])
-        return list(set(links))
+        return [l for l in set(links) if filter_function(l)]
 
     @property
     def brand(self):
