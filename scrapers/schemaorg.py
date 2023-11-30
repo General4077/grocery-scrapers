@@ -38,7 +38,6 @@ class SchemaOrg:
             return
         self.format = None
         self.data = {}
-        self.product = {}
         self.ratingsdata = {}
 
         data = extruct.extract(
@@ -53,11 +52,8 @@ class SchemaOrg:
             syntax_data = data.get(syntax, [])
             for item in syntax_data:
                 if product := self._find_entity(item, "Product"):
-                    key = product.get("sku") or product.get("gtin13")
-                    if key:
-                        self.product[key] = product
-                        self.format = syntax
-                        self.data = product
+                    self.format = syntax
+                    self.data = product
 
 
 class SchemaOrgAvail(enum.Enum):
