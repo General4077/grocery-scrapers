@@ -53,6 +53,8 @@ class AbstractHTTPScraper(ABC):
         headers: Optional[Dict[str, str]] = None,
         html: Union[str, bytes, None] = None,
     ):
+        if url is None and html is None:
+            raise ValueError("Url required for fetching recipe data")
 
         if not headers:
             headers = {"User-Agent": random_user_agent()}
