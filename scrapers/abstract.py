@@ -73,9 +73,8 @@ class AbstractHTTPScraper(ABC):
             )
             self.page_data = resp.content
             self.url = resp.url
-
-        self.soup = BeautifulSoup(self.page_data, "html.parser")
-        self.schema = SchemaOrg(self.page_data)
+        self._soup = None
+        self._schema = None
 
         # attach the plugins as instructed in settings.PLUGINS
         # if not hasattr(self.__class__, "plugins_initialized"):
@@ -88,8 +87,30 @@ class AbstractHTTPScraper(ABC):
         #     setattr(self.__class__, "plugins_initialized", True)
 
     @abstractclassmethod
-    def host(cls) -> str:
+    def host(*cls) -> str:
         """get the host of the url, so we can use the correct scraper"""
+
+    @property
+    def soup(self) -> BeautifulSoup:
+        """Return the BeautifulSoup data for this scraper.
+
+        Returns:
+            BeautifulSoup: The BeautifulSoup data for this scraper.
+        """
+        if self._soup is None:
+            self._soup = BeautifulSoup(self.page_data, "html.parser")
+        return self._soup
+
+    @property
+    def schema(self) -> SchemaOrg:
+        """Return the schema.org data for this scraper.
+
+        Returns:
+            SchemaOrg: The schema.org data for this scraper.
+        """
+        if self._schema is None:
+            self._schema = SchemaOrg(self.page_data)
+        return self._schema
 
     @property
     def offer_parser(self) -> OfferParserProtocol:
