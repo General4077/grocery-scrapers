@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Tuple, Union, Protocol
 from urllib.parse import urljoin, urlparse
 from abc import ABC, abstractclassmethod
 import requests
@@ -16,6 +16,28 @@ from scrapers.parsers import (
 from scrapers.user_agents import random_user_agent
 
 
+class Scraper(Protocol):
+    host: str
+    soup: BeautifulSoup
+    schema: SchemaOrg
+    offer_parser: OfferParserProtocol
+    image_parser: ImageParserProtocol
+    spider_filter: callable
+    to_json: callable
+    canonical_url: callable
+    links: callable
+    target_links: callable
+    spider_links: callable
+    brand: str
+    name: str
+    image: Union[str, bytes, None]
+    description: str
+    sku: str
+    barcode: dict[str, str]
+    reviews: dict[str, str]
+    aggregate_rating: dict[str, str]
+    model_number: str
+    offers: dict[str, str]
 
 
 class AbstractHTTPScraper(ABC):
