@@ -48,15 +48,9 @@ class AbstractHTTPScraper(ABC):
     def __init__(
         self,
         url: Union[str, None],
-        proxies: Optional[
-            Dict[str, str]
-        ] = None,  # allows us to specify optional proxy server
-        timeout: Optional[
-            Union[float, Tuple[float, float], Tuple[float, None]]
-        ] = None,  # allows us to specify optional timeout for request
-        headers: Optional[
-            Dict[str, str]
-        ] = None,  # allows us to specify optional headers
+        proxies: Optional[Dict[str, str]] = None,
+        timeout: Optional[Union[float, Tuple[float, float], Tuple[float, None]]] = None,
+        headers: Optional[Dict[str, str]] = None,
         html: Union[str, bytes, None] = None,
     ):
 
