@@ -4,11 +4,11 @@ This is a contrived derivation of `https://github.com/hhursev/recipe-scrapers/bl
 Refer to that file and `https://schema.org/Product` for more information.
 """
 
+import enum
+
 import extruct
 
-from scrapers.exc import SchemaOrgException
-
-import enum
+from plutus.scrapers.exc import SchemaOrgException
 
 SCHEMA_ORG_HOST = "schema.org"
 
@@ -70,8 +70,14 @@ class SchemaOrgAvail(enum.Enum):
     BACK_ORDER = "BackOrder"
     PRE_SALE = "PreSale"
 
+    def __str__(self):
+        return self.value
+
 
 class SchemaOrgDelivery(enum.Enum):
     LOCKER_DELIVERY = "LockerDelivery"
     ON_SITE_PICKUP = "OnSitePickup"
     PARCEL_SERVICE = "ParcelService"
+
+    def __str__(self) -> str:
+        return self.value

@@ -1,6 +1,6 @@
 from typing import Protocol, Union
 
-from scrapers.schemaorg import SchemaOrgAvail, SchemaOrgDelivery
+from plutus.scrapers.schemaorg import SchemaOrgAvail, SchemaOrgDelivery
 
 
 class OfferParserProtocol(Protocol):
@@ -24,7 +24,7 @@ class DefaultOfferParser:
 
     def _normalize_pickup(self, pickup: str):
         if pickup is None:
-            return None
+            return SchemaOrgDelivery.ON_SITE_PICKUP
         if "schema.org" in pickup:
             return SchemaOrgDelivery(pickup.rsplit("/", 1)[1])
         raise ValueError(f"Unknown pickup format: {pickup}")
@@ -32,9 +32,12 @@ class DefaultOfferParser:
     def __init__(self, offer):
         self.offer = offer
 
-    def to_json(self):
+    def to_json(self) -> dict:
+        price = self.offer.get("price", None)
+        if price is not None:
+            price = str(price)
         return {
-            "price": self.offer.get("price", None),
+            "price": price,
             "priceCurrency": self.offer.get("priceCurrency", None),
             "availability": self._normalize_availability(
                 self.offer.get("availability", None)

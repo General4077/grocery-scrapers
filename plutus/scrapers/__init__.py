@@ -1,10 +1,21 @@
-from typing import Union
+from enum import Enum
 
-from scrapers.abstract import AbstractHTTPScraper, AbstractBrowserScraper, Scraper
-from scrapers.builtin_scrapers import *
+from plutus.scrapers.abstract import (
+    AbstractBrowserScraper,
+    AbstractHTTPScraper,
+    Scraper,
+)
+from plutus.scrapers.builtin_scrapers import *
 
 
-def reigistry_factory() -> dict[str, Scraper]:
+class ScrapeType(Enum):
+    """Scrape type."""
+
+    PRODUCT = "product"
+    SPIDER = "spider"
+
+
+def scraper_registry() -> dict[str, Scraper]:
     """Returns a registry of all scrapers.
 
     The registry prefers http scrapers over browser scrapers.

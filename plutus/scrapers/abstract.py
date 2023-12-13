@@ -1,24 +1,26 @@
-from typing import Dict, Optional, Tuple, Union, Protocol
+from typing import Dict, Optional, Tuple, Union, Protocol, Any
 from urllib.parse import urljoin, urlparse
 from abc import ABC, abstractclassmethod
 import requests
 from bs4 import BeautifulSoup
 from contextlib import suppress
+import htmlmin
 
-
-from scrapers.schemaorg import SchemaOrg
-from scrapers.parsers import (
+from plutus.scrapers.schemaorg import SchemaOrg
+from plutus.scrapers.parsers import (
     DefaultOfferParser,
     OfferParserProtocol,
     ImageParserProtocol,
     DefaultImageParser,
 )
-from scrapers.user_agents import random_user_agent
+from plutus.scrapers.user_agents import random_user_agent
 
 
 class Scraper(Protocol):
     host: str
+    status_code: int
     soup: BeautifulSoup
+    small_soup: str
     schema: SchemaOrg
     offer_parser: OfferParserProtocol
     image_parser: ImageParserProtocol
@@ -66,6 +68,7 @@ class AbstractHTTPScraper(ABC):
         if html:
             self.page_data = html
             self.url = url
+            self.status_code = 200
         else:
             resp = requests.get(
                 url,
@@ -75,6 +78,7 @@ class AbstractHTTPScraper(ABC):
             )
             self.page_data = resp.content
             self.url = resp.url
+            self.status_code = resp.status_code
         self._soup = None
         self._schema = None
 
@@ -102,6 +106,20 @@ class AbstractHTTPScraper(ABC):
         if self._soup is None:
             self._soup = BeautifulSoup(self.page_data, "html.parser")
         return self._soup
+
+    @property
+    def small_soup(self) -> BeautifulSoup:
+        """Return the BeautifulSoup data for this scraper.
+
+        Returns:
+            BeautifulSoup: The BeautifulSoup data for this scraper.
+        """
+        return htmlmin.minify(
+            str(self.soup),
+            remove_empty_space=True,
+            remove_comments=True,
+            remove_all_empty_space=True,
+        )
 
     @property
     def schema(self) -> SchemaOrg:
@@ -229,7 +247,7 @@ class AbstractHTTPScraper(ABC):
         return self.schema.data.get("model")
 
     @property
-    def offers(self):
+    def offers(self) -> dict[str, Any]:
         return self.offer_parser(self.schema.data.get("offers")).to_json()
 
 

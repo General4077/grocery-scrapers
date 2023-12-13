@@ -1,4 +1,4 @@
-from scrapers.abstract import AbstractHTTPScraper
+from plutus.scrapers.abstract import AbstractHTTPScraper
 
 
 # TODO: Fix this scraper
