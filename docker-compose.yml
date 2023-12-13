@@ -1,0 +1,41 @@
+services:
+  scraper:
+    # image:
+    build: 
+      context: ./
+      dockerfile: ./config/client/Dockerfile
+    environment:
+      PLUTUS_REDIS_HOST: redis
+    depends_on:
+      redis:
+        condition: service_healthy
+
+    restart: always
+  # postgres:
+  #   image: postgres:15
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: scraper
+  #     POSTGRES_PASSWORD: scraper
+  #     POSTGRES_DB: scraper
+  #   volumes:
+  #     - ./data:/var/lib/postgresql/data
+  redis:
+    image: redis:6
+    ports:
+      - 6379:6379
+    restart: always
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 5
+  plutus:
+      build: 
+        context: ./
+        dockerfile: ./config/orchestrator/Dockerfile
+      env_file:
+        - ./config/orchestrator/.env
+      depends_on:
+        redis:
+          condition: service_healthy
