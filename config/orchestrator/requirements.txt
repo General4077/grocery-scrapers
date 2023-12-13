@@ -1,0 +1,4 @@
+alembic==1.13.0
+sqlalchemy==2.0
+cython==3.0.2
+redis==5.0.1

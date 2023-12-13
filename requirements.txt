@@ -1,4 +1,0 @@
-bs4==0.0.1
-extruct==0.16.0
-httpx==0.24.1
-requests==2.31.0
