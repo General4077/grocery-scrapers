@@ -11,8 +11,8 @@ from plutus.scrapers.builtin_scrapers import *
 class ScrapeType(Enum):
     """Scrape type."""
 
-    PRODUCT = "product"
-    SPIDER = "spider"
+    PRODUCT = "PRODUCT"
+    SPIDER = "SPIDER"
 
 
 def scraper_registry() -> dict[str, Scraper]:
