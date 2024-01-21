@@ -28,13 +28,18 @@ def scheduler():
     )
     push_queue = RedisQueue(redis, "plutus:incoming:queue")
     results_queue = RedisQueue(redis, "plutus:results:queue")
+    queue_memory = (
+        []
+    )  # TODO: Find a better way to prevent duplicate links from being queued
     initialize()  # push intial commands/configs
     while True:
         q_size = len(push_queue)
+        queue_memory[q_size - 1 :]
         if q_size < QUEUE_THRESHOLD:
-            to_queue = get_links_to_queue(QUEUE_THRESHOLD - q_size)
+            prospect_links = get_links_to_queue(QUEUE_THRESHOLD - q_size)
+            to_queue = list(set(prospect_links).difference(set(queue_memory)))
             push_queue.extend(to_queue)
-            print(f"Queued: {to_queue}")
+            queue_memory.extend(to_queue)
         while len(results_queue) > 0:
             result = results_queue.pop()
             process_result(result)
@@ -43,9 +48,6 @@ def scheduler():
             publish_commands(commands)
         notify()  # alert me if something is wrong
         time.sleep(5)
-
-
-# TODO: This logic will stuff the queue with the same links over and over again. We need to add a way to prevent this.
 
 
 def get_links_to_queue(limit: int = QUEUE_THRESHOLD):
@@ -58,7 +60,10 @@ def get_links_to_queue(limit: int = QUEUE_THRESHOLD):
             select(Link.url, Link.id, Link.type, func.max(Result.created_at))
             .join(LinkStatistics, isouter=True)
             .join(Result, isouter=True)
-            .where(or_(Result.created_at < func.current_date(), Result.id == None))
+            .where(
+                Link.active == "ACTIVE",
+                or_(Result.created_at < func.current_date(), Result.id == None),
+            )
             .group_by(Link.id)
             .order_by(
                 (LinkStatistics.churn / LinkStatistics.link_count)
@@ -66,7 +71,8 @@ def get_links_to_queue(limit: int = QUEUE_THRESHOLD):
                 - (
                     LinkStatistics.failed_ratio
                     * (func.current_date() - func.max(Result.created_at))
-                )
+                ),
+                Link.type,
             )
             .limit(limit)
         )
