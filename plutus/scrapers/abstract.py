@@ -177,6 +177,31 @@ class AbstractHTTPScraper(ABC):
                     json_dict[method] = getattr(self, method)()
         return json_dict
 
+    def to_result(self) -> Result:
+        return Result(
+            ip=get_ip(),
+            url=self.url,
+            link_id=self.link_id,
+            price=self.offers.get("price", None),
+            sale_price=self.offers.get("sale_price", None),
+            availability=self.offers.get("availability", None),
+            pickup=self.offers.get("pickup", None),
+            status_code=self.status_code,
+            source=self.small_soup,
+            product_info={
+                "brand": self.brand,
+                "name": self.name,
+                "image": self.image,
+                "description": self.description,
+                "sku": self.sku,
+                "barcode": self.barcode,
+                "reviews": self.reviews,
+                "aggregate_rating": self.aggregate_rating,
+                "model_number": self.model_number,
+                "offers": self.offers,
+            },
+        )
+
     def canonical_url(self):
         canonical_link = self.soup.find("link", {"rel": "canonical", "href": True})
         if canonical_link:
