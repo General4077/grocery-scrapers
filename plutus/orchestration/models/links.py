@@ -43,6 +43,13 @@ product_to_link_table = Table(
     Column("link_id", Integer, ForeignKey("plutus_links.id")),
 )
 
+result_to_link_table = Table(
+    "plutus_result_links",
+    Base.metadata,
+    Column("result_id", Integer, ForeignKey("plutus_results.id")),
+    Column("link_id", Integer, ForeignKey("plutus_links.id")),
+)
+
 
 class Link(Base):
     __tablename__ = "plutus_links"
@@ -60,6 +67,14 @@ class Link(Base):
         secondary=product_to_link_table,
         back_populates="links",
     )
+    sources = relationship(
+        "Result",
+        secondary=result_to_link_table,
+        back_populates="links",
+    )
+
+    def __eq__(self, __value: object) -> bool:
+        return self.id == __value.id or self.url == __value.url
 
 
 class Result(Base):
@@ -73,6 +88,7 @@ class Result(Base):
     # ip = mapped_column(INET, nullable=False) TODO: Fix when transitioning to postgres
     ip = mapped_column(String, nullable=False)
     link_id = mapped_column(ForeignKey("plutus_links.id"), nullable=False, index=True)
+    link_count = mapped_column(Integer, nullable=False)
     price = mapped_column(Float, nullable=True)
     sale_price = mapped_column(Float, nullable=True)
     availability = mapped_column(Enum(SchemaOrgAvail), nullable=True)
@@ -80,6 +96,26 @@ class Result(Base):
     source = mapped_column(Text, nullable=True)
     status_code = mapped_column(Integer, nullable=True)
     created_at = mapped_column(DateTime, nullable=False, server_default=func.now())
+    links = relationship(
+        "Link",
+        secondary=result_to_link_table,
+        back_populates="sources",
+    )
+
+    @classmethod
+    def from_result(cls, result: ResultDTO):
+        return cls(
+            url=result["url"],
+            ip=result["ip"],
+            link_id=result["link_id"],
+            link_count=len(result["targets"]) + len(result["spiderables"]),
+            price=result["price"],
+            sale_price=result["sale_price"],
+            availability=result["availability"],
+            pickup=result["pickup"],
+            source=result["source"],
+            status_code=result["status_code"],
+        )
 
 
 class LinkStatistics(Base):
@@ -103,10 +139,6 @@ class LinkStatistics(Base):
     failed_ratio = column_property(
         failed_count / os.environ.get("PLUTUS_FAILURE_DENOMINATOR", 1)
     )
-
-    # @property
-    # def failed_ratio(self):
-    #     return self.failed_count / os.environ.get("PLUTUS_FAILURE_DENOMINATOR", 1)
 
 
 class Product(Base):
