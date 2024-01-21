@@ -10,18 +10,30 @@ from sqlalchemy import (
     String,
     Table,
     Text,
+    create_engine,
     func,
 )
-from sqlalchemy.dialects.postgresql import INET
-from sqlalchemy.orm import column_property, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import ENUM, INET
+from sqlalchemy.orm import DeclarativeBase, column_property, mapped_column, relationship
 
-from plutus.orchestration.models import ACTIVE_STATUS_ENUM, Base
 from plutus.scrapers import ScrapeType
 from plutus.scrapers.schemaorg import SchemaOrgAvail, SchemaOrgDelivery
+from plutus.typing import Result as ResultDTO
+
+ACTIVE_STATUS_ENUM = ENUM("ACTIVE", "INACTIVE", name="active_status_enum")
+SCRAPE_TYPE_ENUM = Enum(ScrapeType)
+
+
+class Base(DeclarativeBase):
+    pass
+
 
 # TODO: Add indexes
-# TODO: Add partitioning
 # TODO: postgress Full Text search for matching products
+
+
+engine = create_engine(os.environ.get("PLUTUS_DB_URI"))
+
 
 
 product_to_link_table = Table(
@@ -37,7 +49,8 @@ class Link(Base):
 
     id = mapped_column(Integer, primary_key=True)
     url = mapped_column(String, nullable=False, unique=True)
-    type = mapped_column(Enum(ScrapeType), nullable=False)
+    type = mapped_column(SCRAPE_TYPE_ENUM, nullable=False)
+    active = mapped_column(ACTIVE_STATUS_ENUM, nullable=False, server_default="ACTIVE")
     created_at = mapped_column(DateTime, nullable=False, server_default=func.now())
     updated_at = mapped_column(
         DateTime, nullable=False, server_default=func.now(), onupdate=func.now()

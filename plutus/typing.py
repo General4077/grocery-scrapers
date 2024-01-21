@@ -18,6 +18,7 @@ class Result(TypedDict):
     price: Optional[str]
     sale_price: Optional[str]
     availability: Optional[str]
+    pickup: Optional[str]
     source: str  # TODO use htmlmin to minify html
     targets: list[str]
     spiderables: list[str]

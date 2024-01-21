@@ -5,10 +5,11 @@ from redis import Redis
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
-from plutus.orchestration.models import engine
-from plutus.orchestration.models.links import Link, LinkStatistics, Result
-from plutus.orchestration.typing import CrawlTodo
+from plutus.orchestration.models.links import Link, LinkStatistics, Result, engine
 from plutus.queues import RedisQueue
+from plutus.scrapers import ScrapeType
+from plutus.typing import CrawlTodo
+from plutus.typing import Result as ResultDTO
 
 QUEUE_THRESHOLD = os.environ.get("PLUTUS_QUEUE_THRESHOLD", 100)
 

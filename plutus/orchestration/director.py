@@ -4,11 +4,11 @@ from urllib.parse import urlparse
 
 from redis import Redis
 
-from plutus.orchestration.typing import CrawlTodo, Result
-from plutus.orchestration.utils import get_ip
 from plutus.queues import QueueProtocol, RedisQueue
 from plutus.scrapers import ScrapeType, scraper_registry
 from plutus.spiders import spider_registry
+from plutus.typing import CrawlTodo, Result
+from plutus.utils import get_ip
 
 
 class Director:

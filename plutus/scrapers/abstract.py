@@ -1,19 +1,22 @@
-from typing import Dict, Optional, Tuple, Union, Protocol, Any
-from urllib.parse import urljoin, urlparse
 from abc import ABC, abstractclassmethod
+from contextlib import suppress
+from typing import Any, Dict, Optional, Protocol, Tuple, Union
+from urllib.parse import urljoin, urlparse
+
+import htmlmin
 import requests
 from bs4 import BeautifulSoup
-from contextlib import suppress
-import htmlmin
 
-from plutus.scrapers.schemaorg import SchemaOrg
 from plutus.scrapers.parsers import (
-    DefaultOfferParser,
-    OfferParserProtocol,
-    ImageParserProtocol,
     DefaultImageParser,
+    DefaultOfferParser,
+    ImageParserProtocol,
+    OfferParserProtocol,
 )
+from plutus.scrapers.schemaorg import SchemaOrg
 from plutus.scrapers.user_agents import random_user_agent
+from plutus.typing import Result
+from plutus.utils import get_ip
 
 
 class Scraper(Protocol):
