@@ -79,9 +79,9 @@ class Link(Base):
 
 class Result(Base):
     __tablename__ = "plutus_results"
-    __table_args__ = {
-        "postgresql_partition_by": "RANGE (created_at)",
-    }
+    # __table_args__ = {
+    #     "postgresql_partition_by": "RANGE (created_at)",
+    # }
 
     id = mapped_column(Integer, primary_key=True)
     url = mapped_column(String)
