@@ -1,5 +1,6 @@
 import os
 
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from sqlalchemy import (
     Column,
     DateTime,
@@ -34,6 +35,9 @@ class Base(DeclarativeBase):
 
 engine = create_engine(os.environ.get("PLUTUS_DB_URI"))
 
+SQLAlchemyInstrumentor().instrument(
+    engine=engine,
+)
 
 
 product_to_link_table = Table(

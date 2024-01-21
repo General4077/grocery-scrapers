@@ -1,5 +1,8 @@
 import os
 import time
+from contextlib import suppress
+from logging import getLogger
+from typing import Optional
 
 from redis import Redis
 from sqlalchemy import func, or_, select
@@ -31,20 +34,34 @@ def scheduler():
     queue_memory = (
         []
     )  # TODO: Find a better way to prevent duplicate links from being queued
+    logger = getLogger(__name__)
+    logger.setLevel(os.environ.get("PLUTUS_LOG_LEVEL", "INFO"))
+    logger.info("Starting scheduler...")
+    logger.info("Initializing...")
     initialize()  # push intial commands/configs
+    logger.info("Starting loop...")
     while True:
         q_size = len(push_queue)
         queue_memory[q_size - 1 :]
+        logger.debug("Queue status: %s/%s", q_size, QUEUE_THRESHOLD)
         if q_size < QUEUE_THRESHOLD:
             prospect_links = get_links_to_queue(QUEUE_THRESHOLD - q_size)
+            if len(prospect_links) == 0:
+                logger.info("Queue is empty")
+                continue
             to_queue = list(set(prospect_links).difference(set(queue_memory)))
             push_queue.extend(to_queue)
             queue_memory.extend(to_queue)
+            logger.info(f"Queued: {to_queue}")
+        if len(results_queue) > 0:
+            logger.info("Processing results...")
         while len(results_queue) > 0:
             result = results_queue.pop()
             process_result(result)
+        logger.info("Generating analytics...")
         commands = anlytics()
         if commands:
+            logger.info("Publishing commands...")
             publish_commands(commands)
         notify()  # alert me if something is wrong
         time.sleep(5)
