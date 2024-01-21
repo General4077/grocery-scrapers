@@ -59,25 +59,25 @@ class SchemaOrg:
 class SchemaOrgAvail(enum.Enum):
     """Availability enumeration."""
 
-    IN_STOCK = "InStock"
-    OUT_OF_STOCK = "OutOfStock"
-    PRE_ORDER = "PreOrder"
-    IN_STORE_ONLY = "InStoreOnly"
-    ONLINE_ONLY = "OnlineOnly"
-    SOLD_OUT = "SoldOut"
-    DISCONTINUED = "Discontinued"
-    LIMITED_AVAILABILITY = "LimitedAvailability"
-    BACK_ORDER = "BackOrder"
-    PRE_SALE = "PreSale"
+    InStock = "InStock"
+    OutOfStock = "OutOfStock"
+    PreOrder = "PreOrder"
+    InStoreOnly = "InStoreOnly"
+    OnlineOnly = "OnlineOnly"
+    SoldOut = "SoldOut"
+    Discontinued = "Discontinued"
+    LimitedAvailability = "LimitedAvailability"
+    BackOrder = "BackOrder"
+    PreSale = "PreSale"
 
     def __str__(self):
         return self.value
 
 
 class SchemaOrgDelivery(enum.Enum):
-    LOCKER_DELIVERY = "LockerDelivery"
-    ON_SITE_PICKUP = "OnSitePickup"
-    PARCEL_SERVICE = "ParcelService"
+    LockerDelivery = "LockerDelivery"
+    OnSitePickup = "OnSitePickup"
+    ParcelService = "ParcelService"
 
     def __str__(self) -> str:
         return self.value
