@@ -57,7 +57,7 @@ class Link(Base):
     id = mapped_column(Integer, primary_key=True)
     url = mapped_column(String, nullable=False, unique=True)
     type = mapped_column(SCRAPE_TYPE_ENUM, nullable=False)
-    active = mapped_column(Boolean, nullable=False, server_default=True, default=True)
+    active = mapped_column(Boolean, nullable=False, server_default="true")
     created_at = mapped_column(DateTime, nullable=False, server_default=func.now())
     updated_at = mapped_column(
         DateTime, nullable=False, server_default=func.now(), onupdate=func.now()
