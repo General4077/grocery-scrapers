@@ -1,5 +1,6 @@
 import os
 import time
+from typing import Optional
 
 from redis import Redis
 from sqlalchemy import func, or_, select
@@ -61,7 +62,7 @@ def get_links_to_queue(limit: int = QUEUE_THRESHOLD):
             .join(LinkStatistics, isouter=True)
             .join(Result, isouter=True)
             .where(
-                Link.active == "ACTIVE",
+                Link.active == True,
                 or_(Result.created_at < func.current_date(), Result.id == None),
             )
             .group_by(Link.id)
