@@ -1,0 +1,38 @@
+<form>
+    <fieldset>
+        <legend>{{ legend|default('Link')}}</legend>
+        <p>
+            <label for="url">URL</label>
+            <input type="url" name="url" id="url" value="{{ link.url|default('') if link is defined else '' }}" />
+            <span class="error">{{ errors.url|defualt('') if errors}}</span>
+        </p>
+        <p>
+            <label for="type">Type</label>
+            <select name="type" id="type">
+                <option value="PRODUCT">PRODUCT</option>
+                <option value="SPIDER">SPIDER</option>
+            </select>
+            <span class="error">{{ errors.type|defualt('') if errors }}</span>
+        </p>
+        {% if link is defined %}
+        <p>
+            <label for="updated_date">Updated Date</label>
+            <input type="date" name="updated_date" id="updated_date"
+                value="{{ link.updated_date|default('') if link is defined else '' }}" />
+            <span class="error">{{ errors.updated_date|default('') if errors }}</span>
+        </p>
+        <p>
+            <label for="created_date">Created Date</label>
+            <input type="date" name="created_date" id="created_date"
+                value="{{ link.created_date|default('') if link is defined else '' }}" />
+            <span class="error">{{ errors.created_date|default('') if errors }}</span>
+        </p>
+        <p>
+            <label for="Active">Active</label>
+            <input type="checkbox" name="active" id="active" value="1" {% if link.active %}checked{% endif %} />
+            <span class="error">{{ errors.active|default('') if errors }}</span>
+        </p>
+        {% endif %}
+        <button hx-post="{{ submit_uri if submit_uri else '/links' }}" hx-target="body" type="submit">Submit</button>
+    </fieldset>
+</form>

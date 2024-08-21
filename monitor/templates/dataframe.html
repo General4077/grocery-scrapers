@@ -1,0 +1,31 @@
+<table>
+    <thead>
+        <tr>
+            {% for column in df.columns %}
+            {% if column != "id" %}
+            <th>{{ column.title().replace('_', ' ') }}</th>
+            {% else %}
+            <th></th>
+            {% endif %}
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for idx, row in df.iterrows() %}
+        <tr id="row-{{idx}}">
+            {% for value in row %}
+            {% if loop.index0 == df.columns.get_loc("id") %}
+            <td>
+                <button hx-delete="/links/{{ value }}" hx-target="body" hx-push-url="true"
+                    hx-confirm="Are you sure you want to delete {{ row['url'] }}?">Delete</button>
+                <button>Edit</button>
+                <input type="hidden" name="id" value="{{ value }}" />
+            </td>
+            {% else %}
+            <td>{{ value }}</td>
+            {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
